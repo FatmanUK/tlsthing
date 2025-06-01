@@ -25,23 +25,23 @@ func (re View) end() {
 }
 
 func (re View) log(i uint16, s string) {
-	fmt.Print("[")
-	switch i {
-		case LL_ERROR: {
-			fmt.Print("XXX")
-		}
-		case LL_WARN: {
-			fmt.Print("!!!")
-		}
-		case LL_INFO: {
-			fmt.Print("   ")
-		}
-		case LL_DEBUG: {
-			fmt.Print(">>>")
-		}
-	}
-	fmt.Print("] ")
 	if re.loglevel >= i {
+		fmt.Print("[")
+		switch i {
+			case LL_ERROR: {
+				fmt.Print("XXX")
+			}
+			case LL_WARN: {
+				fmt.Print("!!!")
+			}
+			case LL_INFO: {
+				fmt.Print("   ")
+			}
+			case LL_DEBUG: {
+				fmt.Print(">>>")
+			}
+		}
+		fmt.Print("] ")
 		fmt.Println(s)
 		os.Stdout.Sync()
 	}
