@@ -2,6 +2,7 @@ package main
 
 import (
 	"os"
+	"strconv"
 	"github.com/docopt/docopt-go"
 	"fatgo/docopt_helpers"
 )
@@ -10,6 +11,9 @@ import (
 var build_mode = "Debug"
 var app_name = "tlsthing"
 var app_version = "v0.0.0"
+var internal_repo_path = "/var/tlsthing/repo"
+
+var default_refresh = 60
 
 var noExitParser = &docopt.Parser{
 	HelpHandler:   docopt.PrintHelpOnly,
@@ -28,11 +32,12 @@ func parse_args() error {
 	defer view.end()
 
 	uses := []string{}
-	uses = append(uses, "--repo=<url> [--refresh=<seconds>]")
+	uses = append(uses, "--path=<config> [--repo=<url>] [--refresh=<seconds>]")
 
 	opts := make(map[string]string)
-	opts["--repo=<url>"] = "Config repo URL or file path"
-	opts["--refresh=<seconds>"] = "Config refresh in seconds [default: 60]"
+	opts["--path=<config>"] = "Config file path"
+	opts["--repo=<url>"] = "Config repo URL"
+	opts["--refresh=<seconds>"] = "Config refresh in seconds [default: " + strconv.Itoa(default_refresh) + "]"
 
 	args, err := noExitParser.ParseArgs(
 		docopt_helpers.BuildUsageString(uses, opts),
@@ -40,7 +45,8 @@ func parse_args() error {
 		(app_name + " " + app_version))
 	if err == nil {
 		alive := false
-		if args["--repo"] != "" {
+		_, ok := args["--path"]
+		if ok {
 			alive = true
 		}
 		var config Args
