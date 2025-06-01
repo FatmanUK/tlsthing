@@ -70,14 +70,17 @@ func (re ConfigRepo) do_nothing() {
 func configFactory(args Args) (ConfigRepo, error) {
 	re := ConfigRepo{args, internal_repo_path}
 	err := re.validate()
-	ok := false
-	//ok = re.is_cloned()
-	//if !ok {
-	//	re.clone()
-	//}
-	ok = re.is_ok_repo()
-	if ok {
-		re.pull()
+	// maybe reexamine the logic here
+	exists_locally := re.is_cloned()
+	if !exists_locally {
+		re.clone()
+	}
+	is_ok := re.is_ok_repo()
+	if is_ok {
+		// no need to pull if just cloned
+		if exists_locally {
+			re.pull()
+		}
 	} else {
 		re.archive()
 		re.erase()
