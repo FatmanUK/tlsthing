@@ -8,6 +8,7 @@
 *.so
 *.dylib
 tlsthing
+tlsthingd
 
 # Test binary, built with `go test -c`
 *.test
@@ -17,6 +18,9 @@ tlsthing
 
 # Dependency directories (remove the comment below to include it)
 # vendor/
+
+# Go sum file
+go.sum
 
 # Go workspace file
 go.work
