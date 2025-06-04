@@ -4,16 +4,16 @@ vault_uri: 'https://localhost:8200/'
 tls:
   - name: 'Test 1'
     cert:
-      - file: '/etc/ssl/test.crt'
-        type: 'pem'
-        length: '2y'
-        cn: 'ajr-hcs-lap-03.dreamtrack.co.uk'
-        sans:
-          - 'DNS:test.dreamtrack.co.uk'
-          - 'DNS:*.test.dreamtrack.co.uk'
-          - 'IP:10.1.0.254'
+      file: '/etc/ssl/test.crt'
+      type: 'pem'
+      length: '2y'
+      cn: 'ajr-hcs-lap-03.dreamtrack.co.uk'
+      sans:
+        - 'DNS:test.dreamtrack.co.uk'
+        - 'DNS:*.test.dreamtrack.co.uk'
+        - 'IP:10.1.0.254'
     key:
-      - file: '/etc/ssl/test.key'
-        type: 'pem'
+      file: '/etc/ssl/test.key'
+      type: 'pem'
 ...
 # vim: set filetype=yaml
