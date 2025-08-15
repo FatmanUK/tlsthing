@@ -3,8 +3,7 @@ package main
 import (
 	"os"
 	"strconv"
-	"github.com/docopt/docopt-go"
-	"fatgo/docopt_helpers"
+	dh "fatgo/docopt_helpers"
 )
 
 // Default values may be overridden by build system
@@ -15,13 +14,7 @@ var internal_repo_path = "/var/tlsthing/repo"
 
 var default_refresh = 60
 
-var noExitParser = &docopt.Parser{
-	HelpHandler:   docopt.PrintHelpOnly,
-	OptionsFirst:  false,
-	SkipHelpFlags: false,
-}
-
-func parse_args() error {
+func main() {
 	loglevel := LL_INFO
 	if build_mode == "Debug" {
 		loglevel = LL_DEBUG
@@ -31,43 +24,47 @@ func parse_args() error {
 	view.begin()
 	defer view.end()
 
-	uses := []string{}
-	uses = append(uses, "--path=<config> [--repo=<url>] [--refresh=<seconds>]")
+	s_refresh := strconv.Itoa(default_refresh)
 
-	opts := make(map[string]string)
-	opts["--path=<config>"] = "Config file path"
-	opts["--repo=<url>"] = "Config repo URL"
-	opts["--refresh=<seconds>"] = "Config refresh in seconds [default: " + strconv.Itoa(default_refresh) + "]"
+	options := map[string]dh.HelpOption{}
+	options["--path"] = dh.HelpOption{
+		"<config>",
+		"Config file path",
+		""}
+	options["--repo"] = dh.HelpOption{
+		"<url>",
+		"Config repo URL",
+		""}
+	options["--refresh"] = dh.HelpOption{
+		"<seconds>",
+		"Config refresh in seconds",
+		s_refresh}
 
-	args, err := noExitParser.ParseArgs(
-		docopt_helpers.BuildUsageString(uses, opts),
+	usages := []string{}
+	usages = append(usages, "--path [--repo] [--refresh]")
+	uses, opts := dh.MakeUses(usages, options)
+
+	args, err := dh.NoExitParser.ParseArgs(
+		dh.BuildUsageString(uses, opts),
 		nil, // this nil becomes os.Args[1:]
 		(app_name + " " + app_version))
+
 	if err == nil {
-		alive := false
-		_, ok := args["--path"]
-		if ok {
-			alive = true
-		}
 		var config Args
 		err = args.Bind(&config)
 		if err == nil {
 			app := Control{
 				args: config,
-				alive: alive,
+				alive: dh.IsSet(args, "--path"),
 				view: view}
 			app.main()
-		} else {
-			view.log(LL_ERROR, err.Error())
 		}
-	} else {
-		view.log(LL_ERROR, err.Error())
 	}
-	return err
-}
 
-func main() {
-	if parse_args() != nil {
+	if err != nil {
+		view.log(
+			LL_ERROR,
+			err.Error())
 		os.Exit(1)
 	}
 }
