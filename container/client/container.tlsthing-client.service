@@ -1,0 +1,23 @@
+# container-tlsthing-client.service
+
+[Unit]
+Description=Podman container-tlsthing-client.service
+Documentation=man:podman-generate-systemd(1)
+Wants=network.target
+After=network-online.target
+StartLimitIntervalSec=0
+
+[Service]
+Environment=PODMAN_SYSTEMD_UNIT=%n
+Restart=Always
+RestartSec=10
+TimeoutStopSec=70
+ExecStartPre=/bin/rm -f %t/container-tlsthing-client.pid %t/container-tlsthing-client.ctr-id
+ExecStart=/usr/bin/podman run --label io.containers.autoupdate=registry --conmon-pidfile %t/container-tlsthing-client.pid --cidfile %t/container-tlsthing-client.ctr-id --cgroups=no-conmon --network dreamtrack --replace --name tlsthing-client -d -e TLSTHING_PORT=2443 -e TLSTHING_HOST=tlsthing-director ghcr.io/dreamtrack-net/tlsthing-client --verbosity=3
+ExecStop=/usr/bin/podman stop --ignore --cidfile %t/container-tlsthing-client.ctr-id -t 10
+ExecStopPost=/usr/bin/podman rm --ignore -f --cidfile %t/container-tlsthing-client.ctr-id
+PIDFile=%t/container-tlsthing-client.pid
+Type=forking
+
+[Install]
+WantedBy=multi-user.target default.target

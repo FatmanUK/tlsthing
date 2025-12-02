@@ -1,0 +1,2 @@
+COPY --from=build-release ./tlsthing-client /tlsthing-client
+ENTRYPOINT ["/tlsthing-client", "run"]

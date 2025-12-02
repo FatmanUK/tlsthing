@@ -7,8 +7,6 @@
 *.dll
 *.so
 *.dylib
-tlsthing
-tlsthingd
 
 # Test binary, built with `go test -c`
 *.test
@@ -28,3 +26,11 @@ go.work.sum
 
 # env file
 .env
+
+*.geany
+.tup/
+old/
+build-*/
+*.txt
+tars/
+*.tar

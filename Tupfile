@@ -1,0 +1,50 @@
+VERSION=0.0.1
+
+ENVVARS=CGO_ENABLED=0 GOOS=@(OS) GOARCH=@(ARCH)
+
+COMMON_FLAGS=                               \
+	-X main.VERSION=$(VERSION)          \
+	-X main.BUILD_MODE=@(BUILD_MODE)    \
+	-X main.DEBUG_LEVEL=@(DEBUG_LEVEL)  \
+	-X main.APP_PORT=@(PORT)            \
+	@(EXTRA_LDFLAGS)
+
+######################################################################
+
+DIRECTOR_FLAGS=                            \
+	-X main.APP_NAME=@(DIRECTOR_NAME)  \
+	$(COMMON_FLAGS)
+
+DIRECTOR_SRC=                 \
+	src/director.go       \
+	src/logs.go           \
+	src/key.go            \
+	src/networking.go     \
+	src/database.go       \
+	src/registryDatum.go  \
+	src/commonFuncs.go    \
+	src/buildVars.go
+
+: $(DIRECTOR_SRC)                                             \
+|> $(ENVVARS) go build -o %o -ldflags "$(DIRECTOR_FLAGS)" %f  \
+|> @(DIRECTOR_NAME)
+
+######################################################################
+
+CLIENT_FLAGS=                            \
+	-X main.APP_NAME=@(CLIENT_NAME)  \
+	$(COMMON_FLAGS)
+
+CLIENT_SRC=                   \
+	src/client.go         \
+	src/logs.go           \
+	src/networking.go     \
+	src/registryDatum.go  \
+	src/commonFuncs.go    \
+	src/buildVars.go
+
+: $(CLIENT_SRC)                                             \
+|> $(ENVVARS) go build -o %o -ldflags "$(CLIENT_FLAGS)" %f  \
+|> @(CLIENT_NAME)
+
+######################################################################

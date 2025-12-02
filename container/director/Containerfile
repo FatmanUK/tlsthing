@@ -1,0 +1,2 @@
+COPY --from=build-release ./tlsthing-director /tlsthing-director
+ENTRYPOINT ["/tlsthing-director", "run"]
