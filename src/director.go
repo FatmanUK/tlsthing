@@ -4,7 +4,10 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"bytes"
 	"errors"
+	"net/http"
+	"io/ioutil"
 )
 
 const DocoptString = DocoptAppVer + `
@@ -47,6 +50,65 @@ func makeDsnData(u string, p string) DsnData {
 	dbName := getEnvDefault("DATABASE_NAME", "tlsthing")
 	dbTlsMode := getEnvDefault("DATABASE_TLSMODE", "disable")
 	return DsnData{dbHost, u, p, dbName, dbPort, dbTlsMode}
+}
+
+func getNewRequest(
+		query string,
+		data map[string]string,
+		pbuf *bytes.Buffer) (*http.Request, error) {
+	vaultAddr := getEnvDefault("VAULT_ADDR", "https://localhost")
+	api := fmt.Sprintf("%s/v1", vaultAddr)
+	token := getEnvDefault("VAULT_TOKEN", "")
+	headers := map[string]string{
+		"Accept": "application/json",
+		"Content-Type": "application/json",
+		"X-Vault-Token": token,
+	}
+	url := fmt.Sprintf("%s/%s", api, query)
+	r, err := http.NewRequest(http.MethodGet, url, pbuf)
+	if err != nil {
+		return nil, err
+	}
+	for k, v := range headers {
+		r.Header.Add(k, v)
+	}
+	return r, nil
+}
+
+func GetStaticCreds() (string, string, error) {
+	user := getEnvDefault("POSTGRES_USERNAME", "postgres")
+	pass := getEnvDefault("POSTGRES_PASSWORD", "temppw")
+	return user, pass, nil
+}
+
+// tlsthing role:
+// CREATE ROLE "{{name}}" WITH LOGIN PASSWORD '{{password}}'
+//     VALID UNTIL '{{expiration}}',
+// GRANT ALL ON DATABASE tlsthing TO "{{name}}"
+func GetDynamicCreds() (string, string, error) {
+	call := "database/creds"
+	role := "tlsthing"
+	data := make(map[string]string)
+	var buf bytes.Buffer
+	r, err := getNewRequest(
+		fmt.Sprintf("%s/%s", call, role),
+		data,
+		&buf,
+	)
+	if err != nil {
+		return "", "", err
+	}
+	response, err := http.DefaultClient.Do(r)
+	if err != nil {
+		return "", "", err
+	}
+	defer response.Body.Close()
+	body, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		return "", "", err
+	}
+	fmt.Println(string(body)) // parse out username and password?
+	return string(body), "", nil
 }
 
 func actRun(args map[string]interface{}, logs chan Log) error {

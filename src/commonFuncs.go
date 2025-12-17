@@ -56,11 +56,6 @@ func DoublingSleep(count int, scale float32) {
 	time.Sleep(time.Second * time.Duration(offset))
 }
 
-// get from Vault
-func GetDynamicCreds() (string, string, error) {
-	return "postgres", "temppw", nil
-}
-
 func MakePostgresDsn(dsnStruct DsnData) (string, error) {
 	dsnFormatArray := []string{
 		"host={{ .Host }}",

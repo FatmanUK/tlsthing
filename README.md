@@ -18,6 +18,14 @@ DATABASE_NAME='tlsthing'  Name for database, because maybe you already have a da
 
 DATABASE_TLSMODE='disable'  TLS mode, or "SSL" mode as Postgres calls it.
 
+VAULT_ADDR='https://localhost'  Vault address.
+
+VAULT_TOKEN=''  A Vault token with access to the database creds role.
+
+POSTGRES_USERNAME='postgres'  Static Postgres username.
+
+POSTGRES_PASSWORD='temppw'  Static Postgres password.
+
 ## client
 
 Talks to the director and fetches certificate updates from a Vault CA.
@@ -27,3 +35,7 @@ Talks to the director and fetches certificate updates from a Vault CA.
 TLSTHING_PORT='2443'  Connection port for director.
 
 TLSTHING_HOST='localhost'  Remote host for director.
+
+VAULT_ADDR='https://localhost'  Vault address.
+
+VAULT_TOKEN=''  A Vault token with access to the database creds role.
