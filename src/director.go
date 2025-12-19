@@ -107,8 +107,14 @@ func GetDynamicCreds() (string, string, error) {
 	if err != nil {
 		return "", "", err
 	}
-	fmt.Println(string(body)) // parse out username and password?
-	return string(body), "", nil
+	var credsResponse CredsResponse
+	err = DecodeData(body, &credsResponse)
+	if err != nil {
+		return "", "", err
+	}
+	return	credsResponse.Data.Username,
+		credsResponse.Data.Password,
+		nil
 }
 
 func actRun(args map[string]interface{}, logs chan Log) error {

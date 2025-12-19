@@ -37,6 +37,23 @@ type DsnData struct {
 	TlsMode string
 }
 
+type Creds struct {
+	Password string  `json:"password,omitempty"`
+	Username string  `json:"username,omitempty"`
+}
+
+type CredsResponse struct {
+	RequestId string  `json:"request_id,omitempty"`
+	LeaseId string  `json:"lease_id,omitempty"`
+	Renewable bool  `json:"renewable,omitempty"`
+	LeaseDuration int  `json:"lease_duration,omitempty"`
+	Data Creds  `json:"data,omitempty"`
+	WrapInfo *string  `json:"wrap_info,omitzero"`
+	Warnings *string  `json:"warnings,omitzero"`
+	Auth *string  `json:"auth,omitzero"`
+	MountType string  `json:"mount_type,omitempty"`
+}
+
 func NaiveTwoToThePowerOf(p int) int {
 	var rv int = 1
 	for ; p > 0; p-- {
